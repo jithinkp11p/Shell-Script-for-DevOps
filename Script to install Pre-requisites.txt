@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Install & Configure Docker
+echo -e "\e[1;32mInstall & Configure Docker\e[0m"
+sleep 5s
+sudo apt-get update
+sudo apt-get install docker.io -y
+# sudo usermod -aG docker ubuntu && newgrp docker
+# Store Docker version in a variable
+docker_version=$(docker --version)
+
+# Install and configure Jenkins (Master machine)
+echo -e "\e[1;32mInstall and configure Jenkins \e[0m"
+sleep 5s
+sudo apt update -y
+sudo apt install fontconfig openjdk-17-jre -y
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+   https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+     https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+       /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update -y
+sudo apt-get install jenkins -y
+# Store Jenkins version in a variable
+jenkins_version=$(jenkins --version)
+
+# Install AWS CLI
+echo -e "\e[1;32mInstall AWS CLI\e[0m"
+sleep 5s
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt install unzip
+unzip awscliv2.zip
+sudo ./aws/install
+aws_version=$(aws --version 2>&1)
+
+# Install kubectl
+echo -e "\e[1;32mInstall kubectl\e[0m"
+sleep 5s
+curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin
+kubectl version --short --client
+kubectl_version=$(kubectl version --client --short)
+
+# Install eksctl
+echo -e "\e[1;32mInstall eksctl\e[0m"
+sleep 5s
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+eksctl_version=$(eksctl version)
+
+# Printing the output
+
+echo -e "\e[1;32mPrinting the output\e[0m"
+sleep 5s
+
+# Display each version in different colors
+echo -e "\n\033[1;34mDocker version: $docker_version\033[0m"   # Blue
+echo -e "\033[1;32mJenkins version: $jenkins_version\033[0m"   # Green
+echo -e "\033[1;33mAWS CLI version: $aws_version\033[0m"       # Yellow
+echo -e "\033[1;35mkubectl version: $kubectl_version\033[0m"   # Magenta
+echo -e "\033[1;36meksctl version: $eksctl_version\033[0m"     # Cyan
